@@ -1,4 +1,7 @@
 version: '3.8'
+networks:
+  app-tier:
+    driver: bridge
 services:
   backend:
       build: ./Api
@@ -8,7 +11,10 @@ services:
         - cassandra-node3  
       ports:
         - "3000:3000"
+      networks:
+      - app-tier
   cassandra-node1:
+    container_name: cassandra-node_1
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
@@ -16,22 +22,30 @@ services:
       - CASSANDRA_PASSWORD_SEEDER=yes
     ports:
       - '9042:9042'
+    networks:
+      - app-tier
 
   cassandra-node2:
+    container_name: cassandra-node_2
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
     ports:
       - '9142:9142'
+    networks:
+      - app-tier
 
   cassandra-node3:
+    container_name: cassandra-node_3
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
     ports:
       - '9242:9242'
+    networks:
+      - app-tier
 volumes:
   cassandra-node1:
     driver: local

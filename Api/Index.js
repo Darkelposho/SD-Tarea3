@@ -7,7 +7,7 @@ const app = express();
 
 //Crear cliente de Cassandra con 3 nodos
 const client = new cassandra.Client({
-    contactPoints: ['127.0.0.1:9042', '127.0.0.1:9142', '127.0.0.1:9242'],
+    contactPoints: ['cassandra-cluster:9042', 'cassandra-cluster:9142', 'cassandra-cluster:9242'],
     localDataCenter: 'datacenter1',
     keyspace: 'test'
 });
@@ -25,11 +25,9 @@ var host = process.env.PORT || '0.0.0.0';
 
 
 
-app.get("/", (req, res) => {
-    res.send("Y aqui estamos de vuelta!!!");
-  });
 
-app.post("create", (req, res) => {
+
+app.post("/create", (req, res) => {
   console.log("Creando receta");
   var nombre = req.body.nombre;
   var apellido = req.body.apellido;
@@ -127,6 +125,49 @@ app.post("/delete", (req, res) => {
       }
     }
   );
+});
+
+app.get("/", (req, res) => {
+  res.send("Y aqui estamos de vuelta!!!");
+  //crear tabla paciente y receta
+  client.execute(
+    `CREATE TABLE IF NOT EXISTS paciente (
+      rut int,
+      nombre text,
+      apellido text,
+      email text,
+      fecha_nacimiento text,
+      PRIMARY KEY (rut)
+    )`,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.send("Error");
+
+      } else {
+        console.log("Tabla paciente creada");
+        client.execute(
+          `CREATE TABLE IF NOT EXISTS receta (
+            id int,
+            id_paciente int,
+            comentario text,
+            farmacos text,
+            doctor text,
+            PRIMARY KEY (id)
+          )`,
+          (err, result) => {
+            if (err) {
+              console.log(err);
+              res.send("Error");
+            } else {
+              console.log("Tabla receta creada");
+              res.send("Tablas creadas");
+            }
+          }
+        );
+      }
+    }
+  );  
 });
 
   //Se crea el puerto
