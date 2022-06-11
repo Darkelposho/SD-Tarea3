@@ -6,7 +6,7 @@ const cassandra = require('cassandra-driver');
 const app = express();
 
 const client = new cassandra.Client({
-    contactPoints: ['cassandra-cluster:9042', 'cassandra-cluster:9042', 'cassandra-cluster:9042'],
+    contactPoints: ['cassandra-node1'],
     localDataCenter: 'datacenter1',
     keyspace: 'cassandra_keyspace',
     queryOptions: {
@@ -15,14 +15,14 @@ const client = new cassandra.Client({
     authProvider: new cassandra.auth.PlainTextAuthProvider('cassandra', 'cassandra')
 });
 
-client.connect((err) => {
-    if (err) {
-        console.log('Error al conectar con Cassandra');
-    } else {
-        console.log('Conectado con Cassandra');
-    }
-}
-);
+// client.connect((err) => {
+//     if (err) {
+//         console.log('Error al conectar con Cassandra' + err);
+//     } else {
+//         console.log('Conectado con Cassandra');
+//     }
+// }
+// );
 
 app.use(
     bodyParser.urlencoded({
@@ -141,44 +141,45 @@ var host = process.env.PORT || '0.0.0.0';
 
 app.get("/", (req, res) => {
   res.send("Y aqui estamos de vuelta!!!");
+  client.execute(
+    `CREATE TABLE IF NOT EXISTS paciente (
+      rut int,
+      nombre text,
+      apellido text,
+      email text,
+      fecha_nacimiento text,
+      PRIMARY KEY (rut)
+    )`,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Tabla paciente creada");
+        client.execute(
+          `CREATE TABLE IF NOT EXISTS receta (
+            id int,
+            id_paciente int,
+            comentario text,
+            farmacos text,
+            doctor text,
+            PRIMARY KEY (id)
+          )`,
+          (err, result) => {
+
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("Tabla receta creada");
+            }
+          }
+        );
+      }
+    }
+  );
 });
 
   //Se crea el puerto
   app.listen(port,host, () => {
     console.log(`API run in: http://localhost:${port}.`);
-    // client.execute(
-    //   `CREATE TABLE IF NOT EXISTS paciente (
-    //     rut int,
-    //     nombre text,
-    //     apellido text,
-    //     email text,
-    //     fecha_nacimiento text,
-    //     PRIMARY KEY (rut)
-    //   )`,
-    //   (err, result) => {
-    //     if (err) {
-    //       console.log(err);
-    //     } else {
-    //       console.log("Tabla paciente creada");
-    //       client.execute(
-    //         `CREATE TABLE IF NOT EXISTS receta (
-    //           id int,
-    //           id_paciente int,
-    //           comentario text,
-    //           farmacos text,
-    //           doctor text,
-    //           PRIMARY KEY (id)
-    //         )`,
-    //         (err, result) => {
-
-    //           if (err) {
-    //             console.log(err);
-    //           } else {
-    //             console.log("Tabla receta creada");
-    //           }
-    //         }
-    //       );
-    //     }
-    //   }
-    // );
+    
   });

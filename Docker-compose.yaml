@@ -6,12 +6,14 @@ services:
   backend:
       build: ./Api
       environment:
-        - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-        - CASSANDRA_KEYSPACE=cassandra_keyspace   
+        - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3 
         - CASSANDRA_USERNAME=cassandra
         - CASSANDRA_PASSWORD=cassandra 
       depends_on:
         - cassandra-node1
+      links:
+        - cassandra-node1
+      restart: always
       ports:
         - "3000:3000"
       networks:
@@ -20,7 +22,7 @@ services:
     container_name: cassandra-node-1
     image: bitnami/cassandra:4.0.4
     volumes:
-      - ./cassandra-data:/var/lib/cassandra
+      - ./cassandra-data:/docker-entrypoint-initdb.d
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
@@ -40,6 +42,8 @@ services:
       - CASSANDRA_DATACENTER=datacenter1
       - CASSANDRA_USERNAME=cassandra
       - CASSANDRA_PASSWORD=cassandra 
+    links:
+      - cassandra-node1
     networks:
       - app-tier
 
@@ -52,5 +56,7 @@ services:
       - CASSANDRA_DATACENTER=datacenter1
       - CASSANDRA_USERNAME=cassandra
       - CASSANDRA_PASSWORD=cassandra 
+    links:
+      - cassandra-node1
     networks:
       - app-tier
