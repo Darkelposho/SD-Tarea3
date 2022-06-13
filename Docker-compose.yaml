@@ -11,15 +11,14 @@ services:
         - CASSANDRA_PASSWORD=cassandra 
       depends_on:
         - cassandra-node1
-      links:
-        - cassandra-node1
+        - cassandra-node2
+        - cassandra-node3
       restart: always
       ports:
         - "3000:3000"
       networks:
       - app-tier
   cassandra-node1:
-    container_name: cassandra-node-1
     image: bitnami/cassandra:4.0.4
     volumes:
       - ./cassandra-data:/docker-entrypoint-initdb.d
@@ -27,19 +26,16 @@ services:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
       - CASSANDRA_PASSWORD_SEEDER=yes
-      - CASSANDRA_DATACENTER=datacenter1
       - CASSANDRA_USERNAME=cassandra
       - CASSANDRA_PASSWORD=cassandra 
     networks:
       - app-tier
 
   cassandra-node2:
-    container_name: cassandra-node-2
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-      - CASSANDRA_DATACENTER=datacenter1
       - CASSANDRA_USERNAME=cassandra
       - CASSANDRA_PASSWORD=cassandra 
     links:
@@ -48,12 +44,10 @@ services:
       - app-tier
 
   cassandra-node3:
-    container_name: cassandra-node-3
     image: bitnami/cassandra:4.0.4
     environment:
       - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-      - CASSANDRA_DATACENTER=datacenter1
       - CASSANDRA_USERNAME=cassandra
       - CASSANDRA_PASSWORD=cassandra 
     links:

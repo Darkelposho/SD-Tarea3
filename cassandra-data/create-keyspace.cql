@@ -1,1 +1,0 @@
-create keyspace cassandra_keyspace with replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': '2'};
