@@ -1,4 +1,7 @@
 # SD-Tarea3
+**Intengrantes**
+- Guillermo Correa
+- Alejandro Álvarez
 # Instrucciones de uso
 1. Descargar e instalar archivos del repositorio usando el siguiente comando:
 ```bash
