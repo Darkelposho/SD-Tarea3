@@ -64,7 +64,15 @@ R:
 estos? ¿Cu´al es la ventaja de uno sobre otro? ¿Cu´al utilizar´ıa usted para en el caso actual y por qu´e? Justifique
 apropiadamente su respuesta.
 
+----
+- Las dos estrategias principalmente usadas son SimpleStrategy u NetworkTopologyStrategy. |LocalStrategy
+- NetworkTopologyStrategy permite distribuir las replicas de noods en distintos centros de datos, por otro lado, SimpleStrategy permite hacerlo dentro de un solo centro de datos.
+- Utilizaría SimpleStrategy para el caso actual debido a que se requiere implementar un cluster con tres nodos, implementadas de manera local. 
 
+Existe una tercera estrategia para aplicar ne Cassandra, LocalStrategy  es utilizada de manera interna por cassandra, por lo cual las keyspaces son definidas implicitamente. Debido a que en la tarea se requiere tener dos tablas, una maestra y una esclava lo que requiere una keyspace.
+Fuente: https://www.geeksforgeeks.org/replication-strategy-in-cassandra/
+
+----
 3. Teniendo en cuenta el contexto del problema ¿Usted cree que la soluci´on propuesta es la correcta? ¿Qu´e ocurre
 cuando se quiere escalar en la soluci´on? ¿Qu´e mejoras implementar´ıa? Oriente su respuesta hacia el Sharding (la
 replicaci´on/distribuci´on de los datos) y comente una estrategia que podr´ıa seguir para ordenar los datos.
