@@ -2,8 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cassandra = require('cassandra-driver');
-const { v4: uuidv4 } = require('uuid');
-
+const {
+  v4: uuidv4
+} = require('uuid');
 const app = express();
 
 const client1 = new cassandra.Client({
@@ -109,42 +110,72 @@ app.post("/edit", (req, res) => {
   console.log("Editando receta");
   (async () => {
     var id = req.body.id;
-    var comentario = req.body.comentario;
-    var farmacos = req.body.farmacos;
-    var doctor = req.body.doctor;
-    //Este metodo debera enviar los datos a editar de la receta, siendo necesario el id de este  ́ultimo
-    var query = "UPDATE receta SET comentario = '" + comentario + "', farmacos = '" + farmacos + "', doctor = '" + doctor + "' WHERE id = " + id + "";
-    client2.execute(query, (err, result) => {
+    //verificar si la receta existe
+    var query = "SELECT * FROM receta WHERE id = " + id + " ALLOW FILTERING";
+    await client2.execute(query, (err, result) => {
       if (err) {
         console.log(err);
         res.send(err);
       } else {
-        console.log("Receta editada");
-        res.send("Receta editada");
+        if (result.rows.length == 0) {
+          console.log("Receta no existe, el id " + id + " no existe: ");
+          res.send("Receta no existe");
+        } else {
+          console.log("Receta existe");
+          var comentario = req.body.comentario;
+          var farmacos = req.body.farmacos;
+          var doctor = req.body.doctor;
+          //Editar la receta mediante el id
+          var query1 = "UPDATE receta SET comentario = '" + comentario + "', farmacos = '" + farmacos + "', doctor = '" + doctor + "' WHERE id = " + id;
+          client2.execute(query1, (err, result) => {
+            if (err) {
+              console.log(err);
+              res.send(err);
+            } else {
+              console.log("Receta editada");
+              res.send("Receta editada");
+            }
+          });
+        }
       }
     });
   })();
 });
+
 
 
 app.post("/delete", (req, res) => {
   console.log("Eliminando receta");
   (async () => {
     var id = req.body.id;
-    //Se elimina receta
-    var query = "DELETE FROM receta WHERE id = " + id + "";
-    client2.execute(query, (err, result) => {
+    //verificar si la receta existe
+    var query = "SELECT * FROM receta WHERE id = " + id + " ALLOW FILTERING";
+    await client2.execute(query, (err, result) => {
       if (err) {
         console.log(err);
         res.send(err);
       } else {
-        console.log("Receta eliminada");
-        res.send("Receta eliminada");
+        if (result.rows.length == 0) {
+          console.log("Receta no existe, el id" + id + " no existe");
+          res.send("Receta no existe");
+        } else {
+          console.log("Receta existe");
+          //Eliminar la receta mediante el id
+          var query1 = "DELETE FROM receta WHERE id = " + id;
+          client2.execute(query1, (err, result) => {
+            if (err) {
+              console.log(err);
+              res.send(err);
+            } else {
+              console.log("Receta eliminada");
+              res.send("Receta eliminada");
+            }
+          });
+        }
       }
     });
   })();
 });
-
 
 app.get("/", (req, res) => {
   res.send("Y aqui estamos de vuelta!!!");
